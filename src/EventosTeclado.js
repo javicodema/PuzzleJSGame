@@ -9,9 +9,9 @@ function onKeyDown( event) {
     var posicion = teclas.indexOf(event.keyCode);
     if ( posicion == -1 ) {
         teclas.push(event.keyCode);
+        console.log(event.keyCode);
         switch ( event.keyCode ){
             case 32:
-                controles.disparo = true;
                 controles.continuar = true;
                 break;
             case 38:

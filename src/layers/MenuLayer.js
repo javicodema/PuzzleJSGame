@@ -12,23 +12,6 @@ class MenuLayer extends Layer {
             new Boton(imagenes.boton_jugar,480*0.5,320*0.7);
     }
 
-    calcularPulsaciones(pulsaciones){
-        this.boton.pulsado = false;
-
-        for(var i=0; i < pulsaciones.length; i++){
-            if (this.boton.contienePunto(pulsaciones[i].x , pulsaciones[i].y) ){
-                this.boton.pulsado = true;
-                if ( pulsaciones[i].tipo == tipoPulsacion.inicio) {
-                    controles.continuar = true;
-                }
-            }
-        }
-
-        // No pulsado - Boton Disparo
-        if ( !this.boton.pulsado ){
-            controles.continuar = false;
-        }
-    }
 
     procesarControles( ) {
         // siguiente pantalla

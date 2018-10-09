@@ -8,7 +8,6 @@ class BloqueMovil extends Modelo {
     }
 
     actualizar (){
-        this.vy=-1;
         if ( this.vx == 0){
             this.vxInteligencia = this.vxInteligencia * -1;
             this.vx = this.vxInteligencia;
