@@ -2,7 +2,7 @@ class Jugador extends Modelo {
 
     constructor(x, y) {
         super(imagenes.jugador_idle_derecha , x, y)
-        this.vidas = 10;
+        this.vidas = 3;
         this.tiempoInvulnerable = 0;
 
         this.estado = estados.moviendo;
