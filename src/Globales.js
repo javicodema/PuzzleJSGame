@@ -4,19 +4,20 @@ var entrada = entradas.teclado;
 
 
 var nivelActual = 0;
-var nivelMaximo = 2;
+var objetosMaximos=3;
+var totalVidas = 3;
 
 var cuerpo = {};
 cuerpo.dinamico = 1;
 cuerpo.estatico = 2;
 
 var estados = {};
-estados.moviendo= 2; // Incluye parado, derecha , izquierda
-estados.saltando = 3;
-estados.muriendo = 4;
-estados.muerto = 5;
-estados.disparando = 6;
-estados.impactado = 7;
+estados.questAIniciar= 2; // Incluye parado, derecha , izquierda
+estados.buscandoObjeto = 3;
+estados.objetoEncontrado = 4;
+estados.yaFinalizada = 5;
+estados.questNoAlcanzada = 6;
+estados.juegoFinalizado = 7;
 
 var orientaciones = {};
 orientaciones.derecha = 2;

@@ -19,6 +19,27 @@ class Modelo {
         return false;
     }
 
+    tieneDebajo(modelo, rango){
+        if ((modelo.x + 20) > this.x && (modelo.x - 20) < this.x &&
+            (Math.abs(modelo.y - this.y)) < rango && (modelo.y + 20) > this.y){
+            return true;
+        }else return false;
+    }
+
+    tieneIzq(modelo, rango){
+        if ((modelo.y + 20) > this.y && (modelo.y - 20) < this.y &&
+            (Math.abs(modelo.x - this.x)) < rango && (modelo.x - 20) < this.x){
+            return true;
+        }else return false;
+    }
+
+    tieneDer(modelo, rango){
+        if ((modelo.y + 20) > this.y && (modelo.y - 20) < this.y &&
+            (Math.abs(modelo.x - this.x)) < rango && (modelo.x + 20) > this.x){
+            return true;
+        }else return false;
+    }
+
     dibujar (scrollX,scrollY){
         scrollX = scrollX || 0;
         scrollY = scrollY || 0;

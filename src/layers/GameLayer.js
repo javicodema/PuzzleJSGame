@@ -10,6 +10,7 @@ class GameLayer extends Layer {
         this.objetos=0;
         this.iniciar();
         this.objetoAlmacenado = null;
+        this.totalVidas = 3;
     }
 
     iniciar() {
@@ -42,6 +43,7 @@ class GameLayer extends Layer {
         this.bloques = [];
         this.bloqueMoviles = [];
         this.jugador = new Jugador(50, 50);
+
         this.npcQuest = null;
         this.fondo = new Fondo(imagenes.fondo_2, 480 * 0.5, 320 * 0.5);
         this.fondovidas = new Fondo(imagenes.icono_vidas, 480 * (0.15), 320 * 0.07);
@@ -49,13 +51,12 @@ class GameLayer extends Layer {
         this.enemigos = [];
         this.enemigosTiradores = [];
         this.disparos = [];
-        this.puerta1 = null;
-        this.puerta2 = null;
-        this.puerta3 = null;
+        this.puertas = [];
         this.botiquines = [];
         this.objeto=null;
         this.tiempoHablando = 0;
         this.cargarMapa("res/" + nivelActual + ".txt");
+        this.jugador.vidas = totalVidas;
     }
 
     actualizar() {
@@ -80,6 +81,77 @@ class GameLayer extends Layer {
             this.disparos[i].actualizar();
         }
 
+        for (var i = 0; i < this.enemigosTiradores.length; i++) {
+            switch(this.enemigosTiradores[i].orientacion){
+                case 2:
+                    if (this.enemigosTiradores[i].tieneDebajo(this.jugador,150)) {
+                        var disparo = this.enemigosTiradores[i].disparar();
+                        if (disparo != null) {
+                            this.disparos.push(disparo);
+                            this.espacio.agregarCuerpoDinamico(disparo);
+                        }
+                    }
+                    break;
+                case 4:
+                    if (this.enemigosTiradores[i].tieneIzq(this.jugador,150)) {
+                        var disparo = this.enemigosTiradores[i].disparar();
+                        if (disparo != null) {
+                            this.disparos.push(disparo);
+                            this.espacio.agregarCuerpoDinamico(disparo);
+                        }
+                    }
+                    break;
+                case 6:
+                    if (this.enemigosTiradores[i].tieneDer(this.jugador,150)) {
+                        var disparo = this.enemigosTiradores[i].disparar();
+                        if (disparo != null) {
+                            this.disparos.push(disparo);
+                            this.espacio.agregarCuerpoDinamico(disparo);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if (this.npcQuest!=null&&this.npcQuest.tieneDebajo(this.jugador,60)&&this.tiempoHablando>30) {
+            switch(this.estadoQuest()){
+                case estados.buscandoObjeto:
+                    this.conversacion(this.imgIni);
+                    break;
+                case estados.questNoAlcanzada:
+                    this.conversacion(this.imgPre);
+                    break;
+                case estados.yaFinalizada:
+                    this.conversacion(this.imgSin);
+                    break;
+                case estados.questAIniciar:
+                    this.conversacion(this.imgIni);
+                    this.quest++;
+                    break;
+                case estados.objetoEncontrado:
+                    this.conversacion(this.imgFin);
+                    this.objetoAlmacenado=null;
+                    break;
+                case estados.juegoFinalizado:
+                    this.conversacion(this.imgFin);
+                    this.objetoAlmacenado=null;
+                    this.quest = 0;
+                    this.objetos=0;
+                    this.iniciar();
+                    break;
+            }
+        }
+
+
+        if (this.objeto!= null) {
+            if (this.objeto.colisiona(this.jugador) && this.quest==this.objeto.misionNumber) {
+                this.objetos++;
+                this.espacio.eliminarCuerpoDinamico(this.objeto);
+                this.objetoAlmacenado=this.objeto;
+                this.objeto=null;
+            }
+        }
+
         // colisiones
         for (var i = 0; i < this.enemigos.length; i++) {
             if (this.jugador.colisiona(this.enemigos[i])) {
@@ -88,17 +160,15 @@ class GameLayer extends Layer {
                 this.disparos.splice(i, 1);
                 this.jugador.golpeado();
                 if (this.jugador.vidas <= 0) {
+                    totalVidas = 3;
                     this.iniciar();
                 }
             }
         }
-
-
         // Eliminar disparos sin velocidad
         for (var i = 0; i < this.disparos.length; i++) {
             if (this.disparos[i] != null &&
                 (this.disparos[i].vx == 0 && this.disparos[i].vy == 0)) {
-
                 this.espacio
                     .eliminarCuerpoDinamico(this.disparos[i]);
                 this.disparos.splice(i, 1);
@@ -114,83 +184,13 @@ class GameLayer extends Layer {
             }
         }
 
-
-        for (var i = 0; i < this.enemigosTiradores.length; i++) {
-            switch(this.enemigosTiradores[i].orientacion){
-                case 2:
-                    if ((this.jugador.x + 20) > this.enemigosTiradores[i].x && (this.jugador.x - 20) < this.enemigosTiradores[i].x &&
-                        (Math.abs(this.jugador.y - this.enemigosTiradores[i].y)) < 200 && (this.jugador.y + 20) > this.enemigosTiradores[i].y) {
-                        var disparo = this.enemigosTiradores[i].disparar();
-                        if (disparo != null) {
-                            this.disparos.push(disparo);
-                            this.espacio.agregarCuerpoDinamico(disparo);
-                        }
-                    }
-                    break;
-                case 4:
-                    if ((this.jugador.y + 20) > this.enemigosTiradores[i].y && (this.jugador.y - 20) < this.enemigosTiradores[i].y &&
-                        (Math.abs(this.jugador.x - this.enemigosTiradores[i].x)) < 200 && (this.jugador.x - 20) < this.enemigosTiradores[i].x) {
-                        var disparo = this.enemigosTiradores[i].disparar();
-                        if (disparo != null) {
-                            this.disparos.push(disparo);
-                            this.espacio.agregarCuerpoDinamico(disparo);
-                        }
-                    }
-                    break;
-                case 6:
-                    if ((this.jugador.y + 20) > this.enemigosTiradores[i].y && (this.jugador.y - 20) < this.enemigosTiradores[i].y &&
-                        (Math.abs(this.jugador.x - this.enemigosTiradores[i].x)) < 200 && (this.jugador.x + 20) > this.enemigosTiradores[i].x) {
-                        var disparo = this.enemigosTiradores[i].disparar();
-                        if (disparo != null) {
-                            this.disparos.push(disparo);
-                            this.espacio.agregarCuerpoDinamico(disparo);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        if (this.npcQuest!=null&&(this.jugador.x + 20) > this.npcQuest.x && (this.jugador.x - 20) < this.npcQuest.x &&
-            (Math.abs(this.jugador.y - this.npcQuest.y)) < 40 && (this.jugador.y + 20) > this.npcQuest.y
-            && this.tiempoHablando>30) {
-            //arranca quest else if right, if finished mensaje, else mensaje, else if already finished
-            if(nivelActual==(this.quest-1)&&nivelActual==(this.objetos-1)&&this.objetoAlmacenado!=null){
-                this.pausa = true;
-                this.mensaje =
-                    new Boton(this.imgFin, 480 / 2, 320 / 2);
-                this.tiempoHablando=0;
-                this.objetoAlmacenado=null;
-            }else if(this.objetoAlmacenado==null&&nivelActual==this.quest&&nivelActual==(this.objetos)){
-                this.pausa = true;
-                this.mensaje =
-                    new Boton(this.imgIni, 480 / 2, 320 / 2);
-                this.tiempoHablando=0;
-                this.quest++;
-            }else if(nivelActual<=(this.quest-1)&&nivelActual<=(this.objetos-1)){
-                this.pausa = true;
-                this.mensaje =
-                    new Boton(this.imgSin, 480 / 2, 320 / 2);
-                this.tiempoHablando=0;
-            }//iniciada pero sin acabar
-            else if(nivelActual==(this.quest-1)&&nivelActual==(this.objetos)&&this.objetoAlmacenado==null){
-                this.pausa = true;
-                this.mensaje =
-                    new Boton(this.imgIni, 480 / 2, 320 / 2);
-                this.tiempoHablando=0;
-            } else{
-                this.pausa = true;
-                this.mensaje =
-                    new Boton(this.imgPre, 480 / 2, 320 / 2);
-                this.tiempoHablando=0;
-            }
-        }
-
         for (var i = 0; i < this.disparos.length; i++) {
             if (this.disparos[i] != null &&
                 this.jugador != null &&
                 this.jugador.colisiona(this.disparos[i])) {
                 this.jugador.golpeado();
                 if (this.jugador.vidas <= 0) {
+                    totalVidas=3;
                     this.iniciar();
                 }
             }
@@ -208,33 +208,11 @@ class GameLayer extends Layer {
             }
         }
 
-        if (this.puerta1 != null) {
-            if (this.puerta1.colisiona(this.jugador)) {
-                nivelActual = 0;
+        for (var i = 0; i < this.puertas.length; i++) {
+            if (this.puertas[i].colisiona(this.jugador)) {
+                nivelActual = this.puertas[i].nivel;
+                totalVidas=this.jugador.vidas;
                 this.iniciar();
-            }
-        }
-        if (this.puerta2 != null) {
-            if (this.puerta2.colisiona(this.jugador)) {
-                nivelActual = 1;
-                this.iniciar();
-            }
-        }
-        if (this.puerta3 != null) {
-            if (this.puerta3.colisiona(this.jugador)) {
-                nivelActual = 2;
-                this.iniciar();
-            }
-        }
-
-        if (this.objeto!= null) {
-            if (this.objeto.colisiona(this.jugador) && this.quest==this.objeto.misionNumber) {
-                this.objetos++;
-                this.espacio.eliminarCuerpoDinamico(this.objeto);
-                this.objetoAlmacenado=this.objeto;
-                this.objeto=null;
-            } else if(this.objeto.colisiona(this.jugador)){
-
             }
         }
 
@@ -248,6 +226,12 @@ class GameLayer extends Layer {
         }
     }
 
+    conversacion(rutaImg){
+        this.pausa = true;
+        this.mensaje =
+            new Boton(rutaImg, 480 / 2, 320 / 2);
+        this.tiempoHablando=0;
+    }
 
     calcularScroll() {
         // limite izquierda
@@ -269,8 +253,6 @@ class GameLayer extends Layer {
                 this.scrollY = this.jugador.y - 320 * 0.3;
             }
         }
-
-        // limite derecha
         if (this.jugador.y < this.anchoMapa - 320 * 0.3) {
             if (this.jugador.y - this.scrollY > 320 * 0.7) {
                 this.scrollY = this.jugador.y - 320 * 0.7;
@@ -301,12 +283,12 @@ class GameLayer extends Layer {
         for (var i = 0; i < this.botiquines.length; i++) {
             this.botiquines[i].dibujar(this.scrollX, this.scrollY);
         }
+        for (var i = 0; i < this.puertas.length; i++) {
+            this.puertas[i].dibujar(this.scrollX, this.scrollY);
+        }
         this.fondovidas.dibujar();
         this.vidas.dibujar();
         this.npcQuest.dibujar();
-        if (this.puerta1 != null) this.puerta1.dibujar(this.scrollX, this.scrollY);
-        if (this.puerta2 != null) this.puerta2.dibujar(this.scrollX, this.scrollY);
-        if (this.puerta3 != null) this.puerta3.dibujar(this.scrollX, this.scrollY);
         if (this.objeto != null) this.objeto.dibujar(this.scrollX, this.scrollY);
         if (this.pausa) {
             this.mensaje.dibujar();
@@ -341,6 +323,23 @@ class GameLayer extends Layer {
             this.jugador.moverY(0);
         }
 
+    }
+
+    estadoQuest(){
+        if(nivelActual==(this.quest-1)&&nivelActual==(this.objetos-1)&&this.objetoAlmacenado!=null&&this.objetos==
+            objetosMaximos){
+            return estados.juegoFinalizado;
+        }else if(nivelActual==(this.quest-1)&&nivelActual==(this.objetos-1)&&this.objetoAlmacenado!=null) {
+            return estados.objetoEncontrado;
+        }else if(this.objetoAlmacenado==null&&nivelActual==this.quest&&nivelActual==(this.objetos)){
+            return estados.questAIniciar;
+        }else if(nivelActual<=(this.quest-1)&&nivelActual<=(this.objetos-1)){
+            return estados.yaFinalizada;
+        } else if(nivelActual==(this.quest-1)&&nivelActual==(this.objetos)&&this.objetoAlmacenado==null){
+            return estados.buscandoObjeto;
+        } else{
+            return estados.questNoAlcanzada;
+        }
     }
 
 
@@ -426,22 +425,25 @@ class GameLayer extends Layer {
                 this.espacio.agregarCuerpoDinamico(enemigo);
                 break;
             case "|":
-                this.puerta1 = new Bloque(imagenes.door, x, y);
-                this.puerta1.y = this.puerta1.y - this.puerta1.alto / 2;
+                var puerta = new Puerta(imagenes.door, x, y,0);
+                puerta.y = puerta.y - puerta.alto / 2;
                 // modificación para empezar a contar desde el suelo
-                this.espacio.agregarCuerpoDinamico(this.puerta1);
+                this.puertas.push(puerta);
+                this.espacio.agregarCuerpoDinamico(puerta);
                 break;
             case "@":
-                this.puerta2 = new Bloque(imagenes.door, x, y);
-                this.puerta2.y = this.puerta2.y - this.puerta2.alto / 2;
+                var puerta = new Puerta(imagenes.door, x, y,1);
+                puerta.y = puerta.y - puerta.alto / 2;
                 // modificación para empezar a contar desde el suelo
-                this.espacio.agregarCuerpoDinamico(this.puerta2);
+                this.puertas.push(puerta);
+                this.espacio.agregarCuerpoDinamico(puerta);
                 break;
             case "~":
-                this.puerta3 = new Bloque(imagenes.door, x, y);
-                this.puerta3.y = this.puerta3.y - this.puerta3.alto / 2;
+                var puerta = new Puerta(imagenes.door, x, y,2);
+                puerta.y = puerta.y - puerta.alto / 2;
                 // modificación para empezar a contar desde el suelo
-                this.espacio.agregarCuerpoDinamico(this.puerta3);
+                this.puertas.push(puerta);
+                this.espacio.agregarCuerpoDinamico(puerta);
                 break;
             case "N":
                 this.npcQuest = new Bloque(this.imgNpc, x, y);
