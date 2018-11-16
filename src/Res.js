@@ -3,8 +3,6 @@
 // CUIDADO CON EL disparo_jugador
 var imagenes = {
     jugador : "res/jugador.png",
-    fondo : "res/fondo.png",
-    enemigo : "res/enemigo.png",
     enemigo_movimientoIzq : "res/enemigoMovIzq.png",
     enemigo_movimientoDer : "res/enemigoMovDer.png",
     enemigo_movimientoArr : "res/enemigoMovArr.png",
@@ -12,13 +10,9 @@ var imagenes = {
     enemigoTirIzq: "res/tiradorIzq.png",
     enemigoTirDer: "res/tiradorDer.png",
     enemigoTirAba: "res/tiradorAba.png",
+    enemigo: "res/enemigo.png",
     disparo_jugador : "res/disparo_jugador2.png",
-
-
-    disparo_enemigo : "res/disparo_enemigo.png",
-    icono_puntos : "res/icono_puntos.png",
     icono_vidas : "res/corazon.png",
-    icono_recolectable : "res/icono_recolectable.png",
     fondo_2 : "res/fondo1.jpg",
     jugador_idle_derecha : "res/indy_der.png",
     jugador_idle_izquierda : "res/indy_izq.png",
@@ -28,8 +22,6 @@ var imagenes = {
     jugador_idle_abajo : "res/indy_aba.png",
     jugador_corriendo_arriba : "res/indy_arrC.png",
     jugador_corriendo_abajo : "res/indy_abaC.png",
-    enemigo_correr_izquierda : "res/enemigo_correr_izquierda.png",
-    enemigo_morir : "res/enemigo_morir.png",
     bloque_tierra : "res/bloque_tierra.png",
     bloque_metal : "res/bloque_metal.png",
     menu_fondo : "res/menu_fondo.png",
@@ -37,7 +29,6 @@ var imagenes = {
     mensaje_como_jugar : "res/mensaje_como_jugar.png",
     mensaje_ganar : "res/mensaje_ganar.png",
     mensaje_perder : "res/mensaje_perder.png",
-    recolectable:"res/recolectable.png",
     objeto0:"res/objeto0.png",
     objeto1:"res/objeto1.png",
     objeto2:"res/objeto2.png",
@@ -55,7 +46,8 @@ var imagenes = {
     door:"res/door.png",
     reina:"res/reina.png",
     ninio:"res/ninio.png",
-    senior:"res/senior.png"
+    senior:"res/senior.png",
+    slot:"res/slot.png"
 };
 
 var rutasImagenes = Object.values(imagenes);

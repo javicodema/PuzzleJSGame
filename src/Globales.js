@@ -12,7 +12,7 @@ cuerpo.dinamico = 1;
 cuerpo.estatico = 2;
 
 var estados = {};
-estados.questAIniciar= 2; // Incluye parado, derecha , izquierda
+estados.questAIniciar= 2;
 estados.buscandoObjeto = 3;
 estados.objetoEncontrado = 4;
 estados.yaFinalizada = 5;

@@ -10,7 +10,6 @@ class GameLayer extends Layer {
         this.objetos=0;
         this.iniciar();
         this.objetoAlmacenado = null;
-        this.totalVidas = 3;
     }
 
     iniciar() {
@@ -47,6 +46,8 @@ class GameLayer extends Layer {
         this.npcQuest = null;
         this.fondo = new Fondo(imagenes.fondo_2, 480 * 0.5, 320 * 0.5);
         this.fondovidas = new Fondo(imagenes.icono_vidas, 480 * (0.15), 320 * 0.07);
+        this.fondoSlot = new Fondo(imagenes.slot, 480 * (0.85), 320 * 0.07);
+        if (this.objetoAlmacenado != null) this.fondoObj = new Fondo(this.objetoAlmacenado.rutaIm, 480 * (0.85), 320 * 0.07);
         this.vidas = new Texto(0, 480 * 0.22, 320 * 0.1);
         this.enemigos = [];
         this.enemigosTiradores = [];
@@ -131,12 +132,18 @@ class GameLayer extends Layer {
                 case estados.objetoEncontrado:
                     this.conversacion(this.imgFin);
                     this.objetoAlmacenado=null;
+                    this.fondoObj=null;
                     break;
                 case estados.juegoFinalizado:
                     this.conversacion(this.imgFin);
                     this.objetoAlmacenado=null;
                     this.quest = 0;
                     this.objetos=0;
+                    this.fondoObj=null;
+                    nivelActual=0;
+                    this.pausa = true;
+                    this.mensaje =
+                        new Boton(imagenes.mensaje_ganar, 480/2, 320/2);
                     this.iniciar();
                     break;
             }
@@ -149,6 +156,8 @@ class GameLayer extends Layer {
                 this.espacio.eliminarCuerpoDinamico(this.objeto);
                 this.objetoAlmacenado=this.objeto;
                 this.objeto=null;
+                this.fondoObj= new Fondo(this.objetoAlmacenado.rutaIm, 480 * (0.85), 320 * 0.07);
+                this.fondoObj.dibujar();
             }
         }
 
@@ -235,7 +244,7 @@ class GameLayer extends Layer {
 
     calcularScroll() {
         // limite izquierda
-        if (this.jugador.x > 480 * 0.3) {
+        if (this.jugador.x > 480 * 0.5) {
             if (this.jugador.x - this.scrollX < 480 * 0.3) {
                 this.scrollX = this.jugador.x - 480 * 0.3;
             }
@@ -286,13 +295,15 @@ class GameLayer extends Layer {
         for (var i = 0; i < this.puertas.length; i++) {
             this.puertas[i].dibujar(this.scrollX, this.scrollY);
         }
-        this.fondovidas.dibujar();
-        this.vidas.dibujar();
         this.npcQuest.dibujar();
         if (this.objeto != null) this.objeto.dibujar(this.scrollX, this.scrollY);
+        this.fondoSlot.dibujar();
+        if(this.fondoObj!=null) this.fondoObj.dibujar();
         if (this.pausa) {
             this.mensaje.dibujar();
         }
+        this.fondovidas.dibujar();
+        this.vidas.dibujar();
     }
 
 
